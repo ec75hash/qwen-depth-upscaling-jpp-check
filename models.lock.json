@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "models": [
+    {
+      "repo_id": "Qwen/Qwen3.6-27B",
+      "slug": "qwen36-27b",
+      "revision": "6a9e13bd6fc8f0983b9b99948120bc37f49c13e9",
+      "decoder_prefix": "model.language_model.layers.",
+      "depth": 64,
+      "period": 16,
+      "region": [
+        8,
+        55
+      ],
+      "tensors": [
+        "linear_attn.conv1d.weight",
+        "self_attn.k_proj.weight"
+      ],
+      "min_pairs": 6,
+      "role": "primary",
+      "metadata_sha256": {
+        "config.json": "69db4eb7196bc8190813231b3018ca05d8c2e3abc7b1af19d55c157af44a9d9c",
+        "model.safetensors.index.json": "a8ad2c26fb707ff8c245806315b03e3b4b74595528492423af5dae0ce39b4d9b"
+      }
+    },
+    {
+      "repo_id": "Qwen/Qwen3.5-9B",
+      "slug": "qwen35-9b",
+      "revision": "c202236235762e1c871ad0ccb60c8ee5ba337b9a",
+      "decoder_prefix": "model.language_model.layers.",
+      "depth": 32,
+      "period": 16,
+      "region": [
+        0,
+        31
+      ],
+      "tensors": [
+        "linear_attn.conv1d.weight",
+        "self_attn.k_proj.weight"
+      ],
+      "min_pairs": 6,
+      "role": "negative_control",
+      "metadata_sha256": {
+        "config.json": "d0883072e01861ed0b2d47be3c16c36a8e81c224c7ffaa310c6558fb3f932b05",
+        "model.safetensors.index.json": "26d3539b516be613f39563617cb9d33b3f83d401298125be392c80cefb8f7fe5"
+      }
+    },
+    {
+      "repo_id": "upstage/SOLAR-10.7B-v1.0",
+      "slug": "solar-10p7b",
+      "revision": "5a06298f374dae1fb918d73fba72c7722ce71d36",
+      "decoder_prefix": "model.layers.",
+      "depth": 48,
+      "period": 16,
+      "region": [
+        8,
+        39
+      ],
+      "tensors": [
+        "self_attn.k_proj.weight"
+      ],
+      "min_pairs": 6,
+      "role": "disclosed_duplication_control",
+      "metadata_sha256": {
+        "config.json": "23e8200df67a48ebb6cdef348d7d8103b59733e2061c29a55e189278a8e84d0f",
+        "model.safetensors.index.json": "bf5eb0b288bc70f9d6257e89b905a65329d35b47805e56e4c9d9e96f6c653758"
+      }
+    }
+  ]
+}
