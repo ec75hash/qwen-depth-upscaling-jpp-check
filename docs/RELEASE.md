@@ -5,7 +5,7 @@ Hugging Face carries the same tracked release files as an **analysis dataset** s
 layer-pair and offset CSVs can be inspected without installing the scanner. Neither
 destination contains raw model weights, local caches, credentials, or working journals.
 
-The current matching release is v0.1.2. Both destinations use the same `checksums.json` so the
+The current matching release is v0.2.0. Both destinations use the same `checksums.json` so the
 scientific artifacts can be compared byte for byte. Hosting-generated metadata such as
 the Hub's `.gitattributes` is outside that checksum manifest.
 
@@ -29,3 +29,8 @@ enter the manifest.
 The optional Actions configuration is stored as `docs/verify-workflow.yml`; it is not
 installed as an active workflow. See `CORRECTIONS.md` for the v0.1.0 Hub snapshot and
 the packaging-only v0.1.1 change.
+
+v0.2.0 adds the saved-rank readout evidence and CPU reanalysis of the October 12
+experiment. Reanalysis does not require rerunning model capture. The weight scan and
+its measurements are unchanged; the optional Actions template also checks readout
+reanalysis without launching models.

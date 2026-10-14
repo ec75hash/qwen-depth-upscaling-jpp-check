@@ -5,7 +5,7 @@ type: dataset
 authors:
   - family-names: Shorthill
     given-names: Jeffrey
-version: 0.1.2
+version: 0.2.0
 date-released: 2026-10-14
 license: CC-BY-4.0
 repository-code: "https://github.com/ec75hash/qwen-depth-upscaling-jpp-check"

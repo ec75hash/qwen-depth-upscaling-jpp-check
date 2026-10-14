@@ -3,8 +3,6 @@ license: cc-by-4.0
 language:
   - en
 pretty_name: Repeated block structure in Qwen3.6-27B
-size_categories:
-  - 1K<n<10K
 tags:
   - interpretability
   - model-analysis
@@ -19,6 +17,10 @@ configs:
     data_files:
       - split: analysis
         path: data/offsets.csv
+  - config_name: jpp_readout_ranks
+    data_files:
+      - split: held_out
+        path: data/jpp_readouts/held_out_ranks.csv
 ---
 
 # Repeated block structure in Qwen3.6-27B
@@ -26,12 +28,19 @@ configs:
 **Qwen3.6-27B has a localized repeated-block weight pattern at offsets 16 and 32,
 consistent with three trained copies of a 16-block region: 8–23 ≈ 24–39 ≈ 40–55.**
 The pattern is present in both DeltaNet convolution and full-attention key-projection
-weights. This release packages decoder-only measurements, a disclosed-duplication
-positive control, a smaller-model negative control, figures, and CPU reproduction code.
+weights. **The October 12 J++ readout check does not show a corresponding distinct
+copy-aligned signature:** its advantage persists across the three regions (about
++33/+35/+33 percentage points under the paper's reporting convention), with small
+internal boundary changes and no distinct offset-16 readout peak.
 
-Jeffrey Shorthill · independent interpretability research · 2026-10-14 · v0.1.2
+This release packages decoder-only weight measurements, SOLAR and Qwen3.5-9B controls,
+the saved ranks for 329 locally held-out readout items, figures, and CPU reproduction.
+
+Jeffrey Shorthill · independent interpretability research · 2026-10-14 · v0.2.0
 
 ![Layer-pair similarities and controls](figures/weight_similarity.png)
+
+![J++ readout check](figures/jpp_readout_check.png)
 
 ## Read the evidence
 
@@ -40,7 +49,8 @@ Jeffrey Shorthill · independent interpretability research · 2026-10-14 · v0.1
 - **[Methods](METHODS.md):** tensor selection, cosine definition, controls, and indexing.
 - **[Correction record](CORRECTIONS.md):** layer counts, offset enumeration, auxiliary-head exclusion, and claim wording.
 - **[Data dictionary](data/README.md):** CSV/JSON schemas and provenance.
-- **[J++ follow-up](docs/JPP_FOLLOWUP.md):** preliminary readout comparison and the specific next experiment.
+- **[Readout evidence](data/jpp_readouts/README.md):** saved ranks, comparison conventions, and capture provenance.
+- **[J++ follow-up](docs/JPP_FOLLOWUP.md):** measured readout null and the specific intervention question.
 
 All block indices are zero-based original decoder indices. Qwen3.6-27B has **64 decoder
 blocks: 48 DeltaNet and 16 full-attention**. Auxiliary multi-token-prediction parameters
@@ -59,6 +69,8 @@ python -m pip install -r requirements.txt
 python -m unittest discover -s tests -v
 python scripts/verify_release.py
 python scripts/make_report.py --out /tmp/qwen-block-figures --report /tmp/qwen-block-results.md
+python scripts/reanalyze_readouts.py --out /tmp/qwen-readout-reanalysis.json
+python scripts/plot_readouts.py --data /tmp/qwen-readout-reanalysis.json --out /tmp/qwen-readout-figures
 
 # Online: independently range-read selected public tensors at pinned Hub revisions.
 # Keep the released evidence intact by writing a new capture directory.
@@ -95,11 +107,16 @@ The finding is relevant to interpreting layer comparisons in
 which uses Qwen3.6-27B as its main model. Corresponding block positions provide a
 structural control alongside absolute depth. This release does not claim a matched
 reproduction of the paper's lens-performance comparison or a causal explanation of its gains.
+The measured readout check gives no indication that repeated ancestry explains the
+advantage in this capture. Its scope is MLX 4-bit, a locally reconstructed held-out
+split, and different J++/Neuronpedia lens-fitting budgets. Common-filter gains and
+the exact boundary/offset statistics are reported alongside the main convention.
 
 ## Scope and attribution
 
-This is a focused architecture-evidence release. It contains derived similarities and
-small upstream metadata files; it contains no model weights, lens weights, private
+This is a weight-ancestry and saved-readout evidence release. It contains derived
+similarities, public-evaluation ranks, and small upstream metadata files; it contains
+no model weights, lens weights, activations, private
 correspondence, or model-generated conversation transcripts. The broader MoE routing
 and availability studies are separate work.
 

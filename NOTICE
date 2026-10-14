@@ -14,7 +14,11 @@ Contextual reference:
   Kola Ayonrinde and Jack Lindsey (2026), J++ Lens: Jacobian Filtering Enables
   More Faithful Workspace Lenses.
   https://github.com/safety-research/jpp_lens
-  No J++ source code, lens weights, or evaluation dataset is vendored here.
+  No J++ source code, lens weights, or original evaluation prompts are vendored here.
+  The readout supplement includes derived ranks with public evaluation item identifiers
+  and intermediate labels, using evaluation definitions from safety-research/jpp_lens
+  and anthropics/jacobian-lens (Apache-2.0). Source hashes and the authors' code commit
+  are recorded in data/jpp_readouts/provenance.json.
 
 SOLAR's disclosed construction:
   Kim et al. (2023), SOLAR 10.7B: Scaling Large Language Models with Simple yet

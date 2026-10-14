@@ -6,6 +6,8 @@ import hashlib
 import json
 from pathlib import Path
 
+from reanalyze_readouts import analyze, check_original
+
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -55,8 +57,18 @@ def main():
         count = sum(r["model_slug"] == a["model_slug"] and r["tensor"] == a["tensor"] for r in pairs)
         n = len(a["tensor_layers"])
         assert count == n * (n - 1) // 2
+    readouts = analyze(root / "data/jpp_readouts/held_out_ranks.csv")
+    check_original(readouts, json.loads((root / "data/jpp_readouts/capture_summary.json").read_text()))
+    assert readouts["n_items"] == 329 and readouts["n_units"] == 526
+    for region in ("copyA_8_23", "copyB_24_39", "copyC_40_55"):
+        assert readouts["layer_sets"][region]["gain_published_convention"] > 0
+        assert readouts["layer_sets"][region]["gain_common_filter"] > 0
+    assert abs(readouts["boundary_deltas"]["jpp"]["23->24"]) < .01
+    assert abs(readouts["boundary_deltas"]["jpp"]["39->40"]) < .01
+    sim = readouts["aligned_copy_similarity"]["jpp"]["16"]
+    assert sim["k=12"] > sim["k=16"] > sim["k=20"]
     print(f"PASS: {len(checksums)} checksums, five tensor analyses, source provenance, decoder namespaces, "
-          f"{len(pairs)} layer pairs, primary pattern and controls")
+          f"{len(pairs)} layer pairs; October 12 readout reanalysis (329 items / 526 units)")
 
 
 if __name__ == "__main__":

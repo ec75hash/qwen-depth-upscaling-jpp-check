@@ -1,90 +1,121 @@
-# Repeated block ancestry as a control for Qwen3.6-27B interpretability studies
+# Repeated block ancestry in Qwen3.6-27B, without a corresponding J++ readout signature
 
-Jeffrey Shorthill · 2026-10-14 · architecture evidence v0.1.2
+Jeffrey Shorthill · 2026-10-14 · weights and saved-readout evidence v0.2.0
 
-## Finding
+## Main finding
 
-The weights of Qwen3.6-27B contain a sharp, block-localized similarity pattern consistent
-with three trained copies of a 16-block region. In zero-based decoder coordinates,
-the corresponding regions are **8–23, 24–39, and 40–55**, with eight blocks below and
-eight above. Offsets 16 and 32 connect corresponding positions between these regions.
+Qwen3.6-27B contains a sharp weight-similarity pattern consistent with three trained
+copies of a 16-block region: **8–23 ≈ 24–39 ≈ 40–55**, in zero-based decoder indices.
+Our October 12 check of the released J++ lens found **no comparably distinct copy-aligned
+signature in its readouts**: its recall advantage persisted across all three regions,
+the internal copy boundaries produced small changes, and offset 16 was not a local
+peak relative to same-type offsets 12 and 20. The ancestry is visible in the weights;
+the readout evidence so far gives no indication that crossing the region boundaries
+explains the observed J++ advantage. Matched-slot interventions remain the open test.
 
-The evidence is not just a consequence of the model's repeating attention types:
-the large similarities are localized to the proposed repeated region, fall sharply at
-its boundaries, and are absent at other same-type offsets. Both the DeltaNet convolution
-and the full-attention key-projection families carry the offset-16/32 pattern,
-**weaker in the attention projections than in the DeltaNet convolutions**. Across all
-valid pairs, the mean cosines at offsets 16/32 are **0.206/0.096 in attention**
-(12/8 pairs), versus **0.573/0.400 in DeltaNet** (36/24 pairs).
+## Weight evidence and calibration
 
-![Offset spectra and boundaries](figures/offsets_and_boundaries.png)
+Offsets 16 and 32 connect corresponding positions in the three inferred repeated
+regions, with eight blocks below and eight above. The pattern is localized to that
+region and falls sharply at its boundaries. Both the DeltaNet depthwise-convolution
+and full-attention key-projection families carry it. These tensors differ greatly in
+size and structure: **40,960 parameters per Qwen3.6-27B conv1d kernel versus 5,242,880
+per key projection**. Their raw cosine magnitudes are reported separately; comparisons
+use the same parameter family across models rather than ranking the two families.
 
-## Evidence and controls
+| Parameter family | Qwen3.6-27B offset 16 / 32 | Qwen3.5-9B offset 16 | SOLAR offset 16 |
+|---|---:|---:|---:|
+| DeltaNet conv1d | .573 / .400 (36 / 24 pairs) | −.000381 (12 pairs) | Not applicable |
+| Attention key projection | .206 / .096 (12 / 8 pairs) | .000060 (4 pairs) | .435 (32 pairs) |
 
-The release scans public BF16 tensors at pinned Hub commits, without running the models.
-For each tensor family it compares flattened weights between every pair of decoder
-blocks carrying that tensor. Means at each offset use all valid pairs; means restricted
-to the proposed repeated region are separate estimands. Exact values, counts, and
-strongest offsets are generated in [RESULTS.md](RESULTS.md).
+These are means over all valid pairs. [RESULTS.md](RESULTS.md) separates means restricted
+to the inferred copied region. Tensor sizes also differ across checkpoints; the controls
+calibrate each parameter family, not an exact cross-model equivalence of training history.
 
-The primary model is Qwen/Qwen3.6-27B. Qwen/Qwen3.5-9B supplies a negative control using
-the same parameter families. SOLAR-10.7B-v1.0 supplies a positive control with a
-[published depth-upscaling construction](https://arxiv.org/abs/2312.15166): the scan
-recovers its offset-16 correspondence between blocks 8–23 and 24–39.
+SOLAR supplies a quantitative yardstick with a
+[documented duplication followed by continued pretraining](https://arxiv.org/html/2312.15166v3):
+its key-projection mean at offset 16 is **.435 overall and .871 within the copied region**,
+versus **.206 and .309 in Qwen's key projections**. Qwen3.5-9B supplies the same-family
+negative controls in the table. SOLAR has no DeltaNet convolution counterpart.
 
-The Qwen pattern is strong evidence of shared block ancestry. Cosine similarity does
-not reveal the exact historical initialization, amount of continued training, or whether
-one region can replace another during inference. The proposed boundaries were identified
-in earlier exploratory work; this release is a corrected, pinned reproduction rather
-than an independent prospective discovery or a statistical test of a newly registered hypothesis.
+Within the inferred Qwen copied regions, similarity decreases with separation:
+offset-16 versus offset-32 means are **.858 versus .800 for conv1d**, and **.309 versus
+.191 for key projections**. Offset 32 compares the first and third regions, two block
+periods apart. This is consistent with shared-copy ancestry followed by
+position-dependent training divergence. It does not establish two sequential
+copying/training stages or exclude simultaneous initialization from one source.
 
-## Relevance to J++ Lens
+![Weight offset spectra and region boundaries](figures/offsets_and_boundaries.png)
 
-[J++ Lens: Jacobian Filtering Enables More Faithful Workspace Lenses](https://www.lesswrong.com/posts/nc9dHfcB22JdMzGbr/j-lens-jacobian-filtering-enables-more-faithful-workspace)
-uses Qwen3.6-27B as its main model. Its readout grid 8, 16, 24, 32, 40, 48, 56 samples
-two recurring positions in the inferred regions: 8/24/40 have relative slot 0,
-16/32/48 have relative slot 8, and 56 is above the repeated region.
+## October 12 readout result: the advantage persists across copies
 
-Its Appendix A intervention bands also have a useful ancestry-relative description.
-The ranges below were verified against Figure 6's caption and Figure 7's accompanying
-text on 2026-10-14; see the [source-check record](docs/SOURCE_CHECKS.md).
+We scored the released J++ lens, Neuronpedia J-lens, and logit lens at **all 63 available
+lens layers (0–62)** on a locally reconstructed held-out split of **329 items / 526
+item–intermediate units** across five tasks. For each region, recall@10 uses the best
+rank within that region, averages intermediate hits within items, then macro-averages
+the tasks. Under the paper's reporting convention (filtered J++ versus full-vocabulary
+J-lens), the observed advantage is approximately **+33, +35, and +33 percentage points**.
 
-| Band in the write-up | Appendix A source | Position under the inferred block mapping |
+| Inferred region | J++ recall@10 | J-lens recall@10 | Approximate gain |
+|---|---:|---:|---:|
+| A: 8–23 | 36.5% | 3.3% | +33 pp |
+| B: 24–39 | 49.0% | 14.0% | +35 pp |
+| C: 40–55 | 60.4% | 27.4% | +33 pp |
+
+J++'s per-layer recall changes by **−0.28 pp at 23→24** and **−0.52 pp at 39→40**.
+Its filtered-rank similarity at offsets **12 / 16 / 20 is .715 / .683 / .608**; offset
+16 lies on a smooth decline, not a distinct local peak. The corresponding offset-32
+comparison is .527 / .492 / .423 at offsets 28 / 32 / 36. The small positive excesses
+over the mean of neighboring offsets (.022 and .017) are not a weight-like peak.
+
+![J++ readout curves, region gains, and offset controls](figures/jpp_readout_check.png)
+
+This is a measured negative result on the authors' released instrument: the strong
+ancestry signal in weights is not mirrored by a distinct periodic readout signature
+in this capture, and the observed advantage is not confined to a particular copy.
+It does not prove statistical equivalence between regions or establish zero bias in
+the authors' BF16 results. With both readouts filtered, gains remain positive but vary
+more across regions: **+31.3 / +27.8 / +22.5 pp**. Forward activations were MLX 4-bit;
+the J++ and Neuronpedia J-lens artifacts were fitted on 64 versus 1000 prompts, and
+the released J++ fitting/evaluation split is unconfirmed. Those differences qualify
+the performance comparison without erasing the observed readout null.
+
+The [rank table and provenance](data/jpp_readouts/README.md) are public. Run
+`python scripts/reanalyze_readouts.py` to reproduce region scores, per-layer curves,
+boundary deltas, and offset controls from the saved ranks. This is reanalysis of the
+October 12 experiment, not a new model run or a matched-budget lens replication.
+
+## Why this matters for J++ interventions
+
+[J++ Lens](https://www.lesswrong.com/posts/nc9dHfcB22JdMzGbr/j-lens-jacobian-filtering-enables-more-faithful-workspace)
+uses Qwen3.6-27B as its main model. Its grid samples recurring slots: 8/24/40 are slot
+0, 16/32/48 are slot 8, and 56 is above the repeated region. Its Appendix A bands map
+to different portions of those regions:
+
+| Published band | Verified source | Position under the inferred mapping |
 |---|---|---|
-| 16–28 | Figure 6 caption | Slots 8–15 of the first region, then slots 0–4 of the second |
-| 24–35 | Figure 7 accompanying text | Slots 0–11 of the second region |
-| 48–59 | Figure 7 accompanying text | Slots 8–15 of the third region, then four blocks above it |
+| 16–28 | Figure 6 caption | Slots 8–15 of A, then slots 0–4 of B |
+| 24–35 | Figure 7 accompanying text | Slots 0–11 of B |
+| 48–59 | Figure 7 accompanying text | Slots 8–15 of C, then four blocks above it |
 
-These are mappings of the write-up's stated inclusive bands to zero-based block IDs,
-not a new execution of the intervention harness. The released lens code records outputs
-of indexed blocks (`record_block_outputs`); any rerun should verify the intervention
-hook sites and endpoint conventions against its pinned code too.
+The [source check](docs/SOURCE_CHECKS.md) verifies the published ranges. The table
+treats endpoints as inclusive; execution and hook conventions must be verified in a
+new intervention run. The lens code records outputs of indexed blocks.
 
-The structural finding motivates comparing **corresponding within-region positions**
-alongside conventional early/late bands. Depth and ancestry-relative position should both
-be retained: the copies have trained apart, occupy different depths, and receive
-different inputs. The finding alone neither explains J++'s performance improvement
-nor changes the paper's cross-model evidence.
-
-## Next experiment
-
-Use the authors' task and scoring definitions to compare readouts at corresponding
-positions across the three regions. For interventions, compare matched slot windows
-in each region and jointly across regions. Match or measure perturbation magnitude,
-use non-aligned same-type windows and unrelated-concept controls, and measure target
-log probabilities and task accuracy. A stronger joint effect alone would not identify
-compensation because joint interventions alter more blocks.
-
-A matched-budget J-lens and confirmed expert-weight fitting/evaluation split would
-permit a controlled lens comparison. Existing local results use different released
-artifacts and a 4-bit forward pass; [the follow-up note](docs/JPP_FOLLOWUP.md) states
-their scope. They are not required to reproduce this architecture result.
+The readout result reduces the immediate concern that repeated ancestry creates the
+apparent readout gain. The unresolved question is causal use: compare corresponding
+slot windows in A, B, and C, individually and jointly, on the original task. Include
+non-aligned same-type windows, unrelated-concept controls, and matched/measured
+perturbation magnitude; measure target log probabilities and task accuracy. A joint
+effect alone does not identify compensation because more blocks are perturbed.
 
 ## Provenance
 
-Earlier exploratory scans and research notes identified the region in September 2026.
-The October 14 release repairs model-depth labeling, full-depth offset enumeration,
-empty-pair handling, and auxiliary-head selection, with regression tests for those
-failure modes. [CORRECTIONS.md](CORRECTIONS.md) records the changes. Checkpoint metadata,
-raw tensor hashes, source byte ranges, all layer-pair similarities, and the scanner hash
-are included so the result can be inspected independently of the author's working drive.
+Earlier September scans identified the region; the corrected October 14 BF16 weight
+scan pins checkpoint commits, tensor hashes and byte ranges, with SOLAR and Qwen3.5-9B
+controls. The October 12 readout capture is separately identified by source-file,
+lens, tokenizer, evaluation-file, and quantized-model configuration hashes. The release
+reproduces weight measurements online and readout statistics from saved ranks; it does
+not redistribute models, lenses, activations, or unrelated exploratory conversations.
+See [METHODS.md](METHODS.md), [CORRECTIONS.md](CORRECTIONS.md), and
+[the readout follow-up](docs/JPP_FOLLOWUP.md).

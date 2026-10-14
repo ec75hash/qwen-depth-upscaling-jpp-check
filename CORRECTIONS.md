@@ -48,3 +48,17 @@ and figures are unchanged. The original Hub tag is preserved.
 v0.1.2 adds the attention-versus-DeltaNet effect sizes directly to the research note
 and records verification of the three Appendix A bands against the primary post.
 Measurements, code, and figures are unchanged.
+
+v0.2.0 adds the October 12 readout evidence to the main note and releases its held-out
+rank table, sanitized provenance, CPU reanalysis, and a new figure. The observed
+advantage persists across all three regions, J++ boundary deltas are small, and the
+tested readouts lack a distinct offset-16/32 peak. Common-filter comparisons and the
+unconfirmed split/different fitting budgets/4-bit forward pass remain explicit.
+
+The same update makes SOLAR a quantitative calibration within key projections and
+compares each tensor family against its own controls; it does not rank a 40,960-parameter
+conv1d kernel against a 5,242,880-parameter key projection as overall copy retention.
+Within-region offset-16/32 means document decreasing similarity with separation, while
+the exact copying/training chronology remains inferred. The weight measurements and
+weight scanner are unchanged. The planned v0.1.3 prose changes were incorporated into
+v0.2.0 before publication; there is no public v0.1.3 tag.

@@ -1,0 +1,118 @@
+{
+  "capture_date": "2026-10-12",
+  "forward_backend": "MLX 4-bit",
+  "source_artifact_sha256": {
+    "ranks_long.csv": "886cbe1118fb2b8ab7680056be40ccc5e176d2f51067ccf9d4714f8f5a9f3ed6",
+    "readout_results.json": "b5a2a89238481032752fc6ad54252125fef019aac0b7e6456ab6ee8d8c0dd8c0",
+    "cohort_manifest.json": "b4ddf3ee95f457742e053fc7207b31ff322e0dc5829ffc8d9375a39f36446f57",
+    "capture_27b_meta.json": "2945835ee5eda6b35af9f6db87c81b92623b23e5faf3a3deb68f0291961497c6",
+    "readout_score.py": "f16052619dd40b8abae0932c1375c814cfb151723a887ffe3e3bff4eb052e134",
+    "readout_capture.py": "57bf5a7e88277f75b9e6308a8dfe3cac19154463d278883d7dc23f35acccb929"
+  },
+  "matrix_report_sha256": "f4d5cf5516a7f3986c47953d3809418fb4d12080b97b936441eced7650f56ca8",
+  "exported_ranks_sha256": "45b438062bb31997cf24036e1f7e2b22923386d6470dfbbf6e2b13627185b171",
+  "authors_code_commit": "93f02cd6c27db765abb127f20eff656bb5d27340",
+  "model": "Qwen/Qwen3.6-27B",
+  "quantized_model_config_sha256": "ede24666ac51e6d5ab948a8a1e6c72fc6effd941ba3aabb6dd942eb517c78043",
+  "tokenizer_json_sha256": "87a7830d63fcf43bf241c3c5242e96e62dd3fdc29224ca26fed8ea333db72de4",
+  "eval_file_sha256": {
+    "lens-eval-association.json": "d1a98cd4911b594282e74168091c77d849dae18ffe2acb5761074853f327d71c",
+    "lens-eval-multihop.json": "50b7e4c9255291c0ca2a8e94615be9f44531fa57bb1a844e4f9616056d987416",
+    "lens-eval-multilingual.json": "fa70b9bd89416a6d8d985a80dc628b109ae6fd3b25b9275c0fc5065d7ff4a0ef",
+    "lens-eval-order-ops.json": "b203206d16ff628152cc86f3838604e06cb54776f3e14fa1c34f150db8bc7560",
+    "lens-eval-poetry.json": "6aeb3415c5a5c3f3827c9efe63f006de02f5ef39a816bbac68e15e733aba60cc",
+    "lens-eval-typo.json": "9d05e16b7234a57d0773d120a4e1c4e94fd3bc2235a8125d4200a70e60ab17aa",
+    "model_correctness.csv": "4fa2969f5a8a6ffc11f610288d5106e1cf965cdfb2c8259b31b3c900338550cf"
+  },
+  "split": {
+    "function": "split_fitting_items",
+    "seed": 0,
+    "fit_fraction": 0.2,
+    "taken_over": "scoreable five-task items in load_recipe_items order",
+    "assumption": "the released J++ lens's expert weights were fit on fit:0 of this list; not verifiable from the artifact (config lacks the split seed)"
+  },
+  "counts": {
+    "five_task_correct": 410,
+    "five_task_scoreable": 409,
+    "fit": 80,
+    "held_out": 329,
+    "order_ops_correct": 41,
+    "order_ops_scoreable": 41
+  },
+  "per_eval": {
+    "multihop": {
+      "scoreable": 49,
+      "fit": 9,
+      "held-out": 40
+    },
+    "multilingual": {
+      "scoreable": 81,
+      "fit": 16,
+      "held-out": 65
+    },
+    "typo": {
+      "scoreable": 96,
+      "fit": 19,
+      "held-out": 77
+    },
+    "association": {
+      "scoreable": 102,
+      "fit": 20,
+      "held-out": 82
+    },
+    "poetry": {
+      "scoreable": 81,
+      "fit": 16,
+      "held-out": 65
+    },
+    "order-ops": {
+      "scoreable": 41,
+      "fit": 0,
+      "held-out": 0
+    }
+  },
+  "macro_evals": [
+    "multihop",
+    "multilingual",
+    "typo",
+    "association",
+    "poetry"
+  ],
+  "tokenization": {
+    "call": "tokenizer(prompt, return_tensors='pt', truncation=True, max_length=512)",
+    "adds_special_tokens": false,
+    "chat_template": "none (raw prompts)"
+  },
+  "readout_rules": {
+    "multihop": "final_token",
+    "multilingual": "final_token",
+    "order-ops": "final_token",
+    "poetry": "last_newline",
+    "association": "final_token",
+    "typo": "final_token"
+  },
+  "capture_convention": "resid[item, block, 0] = output of block b at the readout position (block L output = lens layer L); [.,.,1] = preceding position; block 63 = final residual before the final norm",
+  "head_fidelity": {
+    "argmax_agree": 20,
+    "n": 20,
+    "mean_top10_jaccard": 0.9727272727272727,
+    "max_abs_logit_diff": 0.0703125
+  },
+  "lenses": {
+    "lens": {
+      "sha256": "adc103d4e724d04e721b019ecafa1388ff376541db3ecb78f693e60ed1d8609d",
+      "n_layers": 63,
+      "d_model": 5120
+    },
+    "control1": {
+      "sha256": "4e1f8d5d88dbf1d37cb9203e6ccdc9d823887168e5258600612a96db6277c0a2",
+      "n_layers": 63,
+      "d_model": 5120
+    }
+  },
+  "lens_labels": {
+    "lens": "released J++ (64 fitting sequences)",
+    "control1": "Neuronpedia J-lens (1000 fitting prompts)"
+  },
+  "reproduction_scope": "Reanalysis of saved ranks; capture and lens fitting are not rerun by this release. Quantized weights, lens files, activations and full original capture environment are not redistributed."
+}

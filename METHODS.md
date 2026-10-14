@@ -68,3 +68,27 @@ tables offline. `scan_weights.py` independently fetches the pinned selected tens
 recomputes the pair statistics online. Tiny floating-point differences across BLAS
 implementations may occur. The online capture should be compared numerically with the
 release; artifact SHA-256s refer to exact bytes, not a tolerance-based equivalence claim.
+
+## October 12 readout reanalysis
+
+The readout supplement is a separate saved-artifact experiment, not a fresh inference
+run. `scripts/import_readout_capture.py` exports only held-out rows from the original
+rank table and preserves aggregate targets and sanitized provenance. It excludes the
+unrelated exploratory conversation section of the original result file.
+
+`scripts/reanalyze_readouts.py` reconstructs full-vocabulary and filtered rank matrices
+for three readouts at layers 0–62, verifies complete/unique coverage, and reproduces
+the original region scores, per-layer curves, and offset correlations. Recall@10 first
+averages intermediate hits within an item, then items within a task, then the five tasks.
+Region scores take the best rank within each region. Offset Spearman correlations use
+the same held-out item–intermediate units and common layer anchors for the central
+and flanking same-type offsets. Average tied ranks are used; applying log to ranks
+does not change their Spearman correlation.
+
+The original item-bootstrap intervals remain in `capture_summary.json`. The main
+note/figure use point estimates, which differ slightly from bootstrap resampled means.
+The published-convention gap uses filtered J++ and full-vocabulary J-lens; common-filter
+gaps are also shown. Split uncertainty, artifact fitting-budget differences, and MLX
+4-bit activations are recorded in the supplement. No statistical equivalence test is
+claimed. Reanalysis reproduces the saved rank statistics, not the original capture or
+the authors' matched-budget BF16 performance comparison.
