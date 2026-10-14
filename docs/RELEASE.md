@@ -5,7 +5,7 @@ Hugging Face carries the same tracked release files as an **analysis dataset** s
 layer-pair and offset CSVs can be inspected without installing the scanner. Neither
 destination contains raw model weights, local caches, credentials, or working journals.
 
-The matching release is v0.1.1. Both destinations use the same `checksums.json` so the
+The current matching release is v0.1.2. Both destinations use the same `checksums.json` so the
 scientific artifacts can be compared byte for byte. Hosting-generated metadata such as
 the Hub's `.gitattributes` is outside that checksum manifest.
 

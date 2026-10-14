@@ -29,7 +29,7 @@ The pattern is present in both DeltaNet convolution and full-attention key-proje
 weights. This release packages decoder-only measurements, a disclosed-duplication
 positive control, a smaller-model negative control, figures, and CPU reproduction code.
 
-Jeffrey Shorthill · independent interpretability research · 2026-10-14 · v0.1.1
+Jeffrey Shorthill · independent interpretability research · 2026-10-14 · v0.1.2
 
 ![Layer-pair similarities and controls](figures/weight_similarity.png)
 

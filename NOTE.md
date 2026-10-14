@@ -1,6 +1,6 @@
 # Repeated block ancestry as a control for Qwen3.6-27B interpretability studies
 
-Jeffrey Shorthill · 2026-10-14 · architecture evidence v0.1.1
+Jeffrey Shorthill · 2026-10-14 · architecture evidence v0.1.2
 
 ## Finding
 
@@ -12,7 +12,10 @@ eight above. Offsets 16 and 32 connect corresponding positions between these reg
 The evidence is not just a consequence of the model's repeating attention types:
 the large similarities are localized to the proposed repeated region, fall sharply at
 its boundaries, and are absent at other same-type offsets. Both the DeltaNet convolution
-and the full-attention key-projection families carry the offset-16/32 pattern.
+and the full-attention key-projection families carry the offset-16/32 pattern,
+**weaker in the attention projections than in the DeltaNet convolutions**. Across all
+valid pairs, the mean cosines at offsets 16/32 are **0.206/0.096 in attention**
+(12/8 pairs), versus **0.573/0.400 in DeltaNet** (36/24 pairs).
 
 ![Offset spectra and boundaries](figures/offsets_and_boundaries.png)
 
@@ -42,13 +45,15 @@ uses Qwen3.6-27B as its main model. Its readout grid 8, 16, 24, 32, 40, 48, 56 s
 two recurring positions in the inferred regions: 8/24/40 have relative slot 0,
 16/32/48 have relative slot 8, and 56 is above the repeated region.
 
-Its Appendix A intervention bands also have a useful ancestry-relative description:
+Its Appendix A intervention bands also have a useful ancestry-relative description.
+The ranges below were verified against Figure 6's caption and Figure 7's accompanying
+text on 2026-10-14; see the [source-check record](docs/SOURCE_CHECKS.md).
 
-| Band in the write-up | Position under the inferred block mapping |
-|---|---|
-| 16–28 | Slots 8–15 of the first region, then slots 0–4 of the second |
-| 24–35 | Slots 0–11 of the second region |
-| 48–59 | Slots 8–15 of the third region, then four blocks above it |
+| Band in the write-up | Appendix A source | Position under the inferred block mapping |
+|---|---|---|
+| 16–28 | Figure 6 caption | Slots 8–15 of the first region, then slots 0–4 of the second |
+| 24–35 | Figure 7 accompanying text | Slots 0–11 of the second region |
+| 48–59 | Figure 7 accompanying text | Slots 8–15 of the third region, then four blocks above it |
 
 These are mappings of the write-up's stated inclusive bands to zero-based block IDs,
 not a new execution of the intervention harness. The released lens code records outputs

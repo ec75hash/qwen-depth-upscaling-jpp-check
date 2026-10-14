@@ -44,3 +44,7 @@ The initial Hugging Face snapshot is tagged v0.1.0. The matching GitHub/Hugging 
 release is v0.1.1: the optional CI workflow was moved into `docs/` because the publishing
 GitHub OAuth token does not permit installing workflows. Scientific data, scanner code,
 and figures are unchanged. The original Hub tag is preserved.
+
+v0.1.2 adds the attention-versus-DeltaNet effect sizes directly to the research note
+and records verification of the three Appendix A bands against the primary post.
+Measurements, code, and figures are unchanged.
